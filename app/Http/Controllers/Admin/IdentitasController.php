@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Dokter;
+use App\Models\Unit;
 use App\Models\UnitLayanan;
 use App\Models\Identitas;
 use App\Http\Controllers\Controller;
@@ -15,7 +15,7 @@ class IdentitasController extends Controller
      */
 public function index(Request $request)
 {
-    $query = Identitas::with(['dokter', 'unit'])->latest('tanggal_survei');
+    $query = Identitas::with(['unit'])->latest('tanggal_survei');
 
     // Filter berdasarkan bulan
     if ($request->filled('bulan')) {
@@ -40,33 +40,33 @@ public function index(Request $request)
 }
 
 
-public function create($dokterId)
+public function create()
 {
-    $dokter = Dokter::findOrFail($dokterId);
-    return view('admin.identitas.create', compact('dokter'));
+    $units = UnitLayanan::all();
+    return view('identitas.create', compact('units'));
 }
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
             'no_hp' => 'required',
-            'alamat' => 'nullable',
             'jenis_kelamin' => 'required',
             'usia' => 'required|numeric',
             'pendidikan' => 'required',
             'pekerjaan' => 'required',
-            'tanggal_survei' => 'required|date',
-            'jam_survei' => 'required',
-            'dokter_id' => 'required|exists:dokters,id',
             'unit_layanan_id' => 'required|exists:unit_layanan,id',
         ]);
 
-        $identitas = Identitas::create($request->all());
+                // Isi otomatis tanggal dan jam saat ini
+        $requestData = $request->all();
+
+        $requestData['tanggal_survei'] = now()->toDateString(); // Format YYYY-MM-DD
+        $requestData['jam_survei'] = now()->toTimeString();     // Format HH:MM:SS
+
+        $identitas = Identitas::create($requestData);
 
         
         return redirect()->route('feedback.form', [
             'identitas_id' => $identitas->id,
-            'dokter_id' => $request->dokter_id,
             'unit_id' => $request->unit_layanan_id,
         ]);
     }

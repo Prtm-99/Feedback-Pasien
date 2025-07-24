@@ -1,107 +1,80 @@
 <x-app-layout>
-    <div class="max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6">
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-lg mt-6">
 
-        {{-- Tombol Kembali --}}
-        <div class="mb-4">
-            <a href="{{ url()->previous() }}"
-               class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 transition">
-                ← Kembali
-            </a>
-        </div>
-
-        <h2 class="text-2xl font-bold mb-6 text-blue-800 text-center">
-            📝 Feedback untuk {{ $identitas->nama ?? 'Pasien Tidak Dikenal' }}
-        </h2>
+        <h2 class="text-3xl font-extrabold mb-8 text-center text-blue-800">Form Feedback</h2>
 
         @php
-            $nextTopicId = session('next_topic_id');
-            if (!isset($topics) || $topics->isEmpty()) {
-                echo "<p class='text-red-600 text-center'>⚠️ Data topik tidak tersedia.</p>";
-            } else {
-                $topics = $topics->where('id', $nextTopicId ?? $topics->first()->id);
+            $nextTopicId = session('next_topic_id') ?? $topics->first()?->id;
+            $currentTopic = $topics->firstWhere('id', $nextTopicId);
+
+            if (!$currentTopic) {
+                echo "<p class='text-red-600 text-center font-medium'>Data topik tidak ditemukan.</p>";
             }
         @endphp
 
-        @foreach ($topics as $index => $topic)
-            <form method="POST" action="{{ route('feedback.store', ['identitas' => $identitas->id, 'topic' => $topic->id]) }}"
-                  class="space-y-6 animate-fade-in">
+        @if ($currentTopic)
+            <form method="POST" action="{{ route('feedback.store', ['identitas' => $identitas->id, 'topic' => $currentTopic->id]) }}"
+                    class="space-y-6 animate-fade-in">
                 @csrf
 
-                <div class="bg-blue-50 p-4 rounded-md border border-blue-200">
-                    <h3 class="text-lg font-semibold text-blue-700">{{ $topic->name }}</h3>
+                {{-- Judul Topik --}}
+                <div class="bg-blue-100 p-4 rounded-md border border-blue-300 shadow-sm">
+                    <h3 class="text-xl font-semibold text-blue-900">
+                        {{ $currentTopic->name }}
+                    </h3>
                 </div>
 
-                {{-- PERTANYAAN DINAMIS --}}
-                <div class="space-y-4">
-@foreach ($topic->questions as $question)
-    @php
-        $isStatis = $question->type === 'statis';
-        $options = $isStatis && $question->answer_options
-            ? json_decode($question->answer_options, true)
-            : ['Sangat Puas', 'Puas','Kurang', 'Sangat Kurang'];
-    @endphp
+                {{-- Pertanyaan Dinamis --}}
+                <div class="space-y-6">
+                    @foreach ($currentTopic->questions as $question)
+                        @php
+                            $isStatis = $question->type === 'statis';
+                            $options = $isStatis && $question->answer_options
+                                ? json_decode($question->answer_options, true)
+                                : ['Sangat Puas', 'Puas', 'Kurang', 'Sangat Kurang'];
+                        @endphp
 
-    <div class="p-4 bg-gray-50 border rounded-md shadow-sm">
-        <label class="block text-gray-800 font-medium mb-2">
-            {{ $question->text }}
-        </label>
+                        <div class="p-6 bg-gray-50 border border-gray-200 rounded-xl shadow-sm">
+                            <label class="block text-gray-900 font-semibold text-base mb-4">
+                                {{ $question->text }}
+                            </label>
 
-        <div class="flex flex-wrap gap-3">
-            @foreach ($options as $label)
-                <label class="flex items-center gap-2 bg-white border px-4 py-2 rounded cursor-pointer hover:bg-blue-50 transition">
-                    <input type="radio" name="answers[{{ $question->id }}][value]" value="{{ $label }}" required>
-                    <span class="text-sm font-medium">{{ $label }}</span>
-                </label>
-            @endforeach
-        </div>
+                            <div class="flex flex-wrap gap-4">
+                                @foreach ($options as $label)
+                                    <label class="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer bg-white shadow-sm hover:bg-blue-50 transition-all ring-1 ring-transparent peer-checked:ring-blue-500">
+                                        <input type="radio" name="answers[{{ $question->id }}][value]" value="{{ $label }}" required class="hidden peer">
+                                        <span class="text-sm font-medium peer-checked:text-blue-600">{{ $label }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
 
-        <input type="text" name="answers[{{ $question->id }}][comment]"
-               placeholder="🗣️ Komentar (opsional)"
-               class="mt-3 w-full p-2 border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
-    </div>
-@endforeach
-
+                            <input type="text" name="answers[{{ $question->id }}][comment]"
+                                   placeholder="Tulis komentar (opsional)"
+                                   class="mt-4 w-full p-2 border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none"
+                            >
+                        </div>
+                    @endforeach
                 </div>
+                {{-- Tombol Navigasi --}}
+                <div class="flex flex-col sm:flex-row justify-between items-center pt-6 gap-4">
+                    {{-- Tombol Kembali --}}
+                    <a href="{{ url()->previous() }}"
+                    class="inline-flex items-center gap-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        <i class="fas fa-arrow-left"></i>
+                        Kembali
+                    </a>
 
-                {{-- PERTANYAAN STATIS --}}
-                @if ($loop->first && isset($staticQuestions) && count($staticQuestions))
-                    <div class="border-t pt-6 mt-6">
-                        <h4 class="font-semibold text-gray-700 mb-4">📋 Pertanyaan Tambahan (Statis)</h4>
-
-@foreach ($staticQuestions as $sq)
-    @php
-        $options = json_decode($sq->answer_options, true);
-    @endphp
-
-    <div class="mb-4 bg-gray-50 p-4 rounded border">
-        <label class="block text-gray-800 font-medium mb-2">{{ $sq->text }}</label>
-        <select name="answers[{{ $sq->id }}][value]" required
-                class="w-full border-gray-300 rounded p-2 focus:ring focus:ring-blue-300">
-            <option disabled selected>-- Pilih jawaban --</option>
-            @foreach ($options as $opt)
-                <option value="{{ $opt }}">{{ $opt }}</option>
-            @endforeach
-        </select>
-        <textarea name="answers[{{ $sq->id }}][comment]" rows="2"
-                  placeholder="Komentar (opsional)"
-                  class="mt-2 w-full p-2 border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none"></textarea>
-    </div>
-@endforeach
-
-                    </div>
-                @endif
-
-                <div class="flex justify-end pt-4">
+                    {{-- Tombol Lanjutkan --}}
                     <button type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow transition duration-200 ease-in-out">
-                        Lanjut ➡️
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        Lanjutkan
                     </button>
                 </div>
             </form>
-        @endforeach
+        @endif
     </div>
 
-    {{-- Animasi Fade --}}
+    {{-- Animasi Fade In --}}
     <style>
         .animate-fade-in {
             opacity: 0;
@@ -116,4 +89,7 @@
             }
         }
     </style>
+
+    {{-- FontAwesome (untuk ikon tombol kembali) --}}
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </x-app-layout>

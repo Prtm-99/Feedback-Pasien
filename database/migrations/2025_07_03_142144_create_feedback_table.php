@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('question_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('identitas_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('unit_id')->nullable()->constrained('unit_layanan')->onDelete('set null');
-            $table->foreignId('dokter_id')->nullable()->constrained('dokters')->onDelete('set null');
             $table->foreignId('topic_id')->nullable()->constrained('topics')->onDelete('set null');
 
             $table->enum('answer', ['Sangat Puas', 'Puas', 'Kurang', 'Sangat Kurang']);

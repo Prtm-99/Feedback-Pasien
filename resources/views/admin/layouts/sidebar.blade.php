@@ -18,7 +18,7 @@
     {{-- Logo & Collapse/Close Button --}}
     <div class="flex items-center justify-between px-4 py-6">
         <div class="flex items-center gap-2">
-            <img src="{{ asset('storage/r.jpeg') }}" alt="Logo" class="w-10 h-10 rounded-full">
+            <img src="{{ asset('storage/rsmg.png') }}" alt="Logo" class="w-10 h-10 rounded-full">
             <span class="text-xl font-semibold" x-show="!sidebarCollapse" x-transition>MyDashboard</span>
         </div>
 
@@ -41,11 +41,10 @@
             $navItems = [
                 ['label' => 'Dashboard', 'icon' => 'fas fa-home', 'route' => 'admin.dashboard', 'check' => 'admin.dashboard'],
                 ['label' => 'Unit', 'icon' => 'fas fa-building', 'route' => 'admin.unit.index', 'check' => 'admin.unit.*'],
-                ['label' => 'Dokter', 'icon' => 'fas fa-user-md', 'route' => 'admin.dokter.index', 'check' => 'admin.dokter.*'],
                 ['label' => 'Topik', 'icon' => 'fas fa-tags', 'route' => 'admin.topic.index', 'check' => 'admin.topic.*'],
                 ['label' => 'Pertanyaan', 'icon' => 'fas fa-question-circle', 'route' => 'admin.question.index', 'check' => 'admin.question.*'],
                 ['label' => 'Identitas', 'icon' => 'fas fa-id-card', 'route' => 'admin.identitas.index', 'check' => 'admin.identitas.*'],
-                ['label' => 'Feedback', 'icon' => 'fas fa-comments', 'route' => 'admin.feedback.index', 'check' => 'admin.feedback.*'],
+                ['label' => 'Hasil', 'icon' => 'fas fa-comments', 'route' => 'admin.feedback.index', 'check' => 'admin.feedback.*'],
             ];
         @endphp
 
@@ -95,6 +94,6 @@
 
     {{-- Footer --}}
     <div class="text-xs text-blue-200 text-center mt-6 px-2" x-show="!sidebarCollapse" x-transition>
-        &copy; {{ date('Y') }} MyWebsite
+        &copy; {{ date('Y') }} RSMG
     </div>
 </aside>

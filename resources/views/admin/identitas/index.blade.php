@@ -46,14 +46,11 @@
                         <thead class="bg-gray-100 dark:bg-gray-800 text-xs uppercase font-bold text-gray-700 dark:text-gray-300">
                             <tr>
                                 <th class="px-4 py-3">#</th>
-                                <th class="px-4 py-3">Nama</th>
                                 <th class="px-4 py-3">No HP</th>
                                 <th class="px-4 py-3">Usia</th>
-                                <th class="px-4 py-3">Alamat</th>
                                 <th class="px-4 py-3">Gender</th>
                                 <th class="px-4 py-3">Pendidikan</th>
                                 <th class="px-4 py-3">Pekerjaan</th>
-                                <th class="px-4 py-3">Dokter</th>
                                 <th class="px-4 py-3">Unit</th>
                                 <th class="px-4 py-3">Tgl Survei</th>
                                 <th class="px-4 py-3">Jam</th>
@@ -64,14 +61,11 @@
                             @forelse($identitasList as $index => $identitas)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition duration-150">
                                     <td class="px-4 py-2">{{ $index + 1 }}</td>
-                                    <td class="px-4 py-2">{{ $identitas->nama }}</td>
                                     <td class="px-4 py-2">{{ $identitas->no_hp }}</td>
-                                    <td class="px-4 py-2">{{ $identitas->usia }}</td>
-                                    <td class="px-4 py-2">{{ $identitas->alamat }}</td>
+                                    <td class="px-4 py-2">{{ $identitas->usia }}</td>                                    <td class="px-4 py-2">{{ $identitas->alamat }}</td>
                                     <td class="px-4 py-2">{{ $identitas->jenis_kelamin }}</td>
                                     <td class="px-4 py-2">{{ $identitas->pendidikan }}</td>
                                     <td class="px-4 py-2">{{ $identitas->pekerjaan }}</td>
-                                    <td class="px-4 py-2">{{ $identitas->dokter->nama ?? '-' }}</td>
                                     <td class="px-4 py-2">{{ $identitas->unit->nama_unit ?? '-' }}</td>
                                     <td class="px-4 py-2">{{ $identitas->tanggal_survei }}</td>
                                     <td class="px-4 py-2">{{ $identitas->jam_survei }}</td>

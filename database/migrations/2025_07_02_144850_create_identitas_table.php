@@ -13,9 +13,7 @@ return new class extends Migration
     {
 Schema::create('identitas', function (Blueprint $table) {
     $table->id();
-    $table->string('nama');
     $table->string('no_hp');
-    $table->text('alamat')->nullable();
     $table->string('jenis_kelamin');
     $table->integer('usia');
     $table->string('pendidikan');
@@ -23,9 +21,7 @@ Schema::create('identitas', function (Blueprint $table) {
     $table->date('tanggal_survei');
     $table->time('jam_survei');
     $table->foreignId('unit_layanan_id')->nullable()->constrained('unit_layanan')->onDelete('set null');
-    $table->foreignId('dokter_id')->nullable()->constrained('dokters')->onDelete('set null');
     $table->foreignId('topic_id')->nullable()->constrained('topics')->onDelete('set null');
-
     $table->timestamps();
 });
 }

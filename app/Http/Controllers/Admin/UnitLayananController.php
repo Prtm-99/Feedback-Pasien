@@ -10,7 +10,9 @@ class UnitLayananController extends Controller
 {
     public function index()
     {
+        // Hapus pemanggilan relasi 'dokters'
         $units = UnitLayanan::all();
+
         return view('admin.unit.index', compact('units'));
     }
 
@@ -36,12 +38,13 @@ class UnitLayananController extends Controller
         return view('admin.unit.show', compact('unit'));
     }
 
-    public function showDokter($id)
-    {
-        $unit = UnitLayanan::with('dokters')->findOrFail($id);
+    // Hapus method showDokter karena berhubungan dengan dokter
+    // public function showDokter($id)
+    // {
+    //     $unit = UnitLayanan::with('dokters')->findOrFail($id);
+    //     return view('admin.unit.dokter', compact('unit'));
+    // }
 
-        return view('admin.unit.dokter', compact('unit'));
-    }
     public function edit(UnitLayanan $unit)
     {
         return view('admin.unit.edit', compact('unit'));

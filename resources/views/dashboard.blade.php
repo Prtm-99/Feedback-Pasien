@@ -16,13 +16,13 @@
             @endif
 
             <div class="flex items-center justify-between">
-                <h3 class="text-xl font-bold text-gray-800 dark:text-white">📋 Daftar Unit Layanan</h3>
+                <h3 class="text-2xl font-bold text-gray-800">📋 Daftar Unit Layanan</h3>
             </div>
 
             @if(isset($units) && $units->count())
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     @foreach($units as $unit)
-                        <a href="{{ route('admin.dokter.show', $unit->id) }}"
+                        <a href="{{ route('identitas.create', $unit->id) }}"
                            class="group block rounded-xl overflow-hidden shadow-lg transition transform hover:-translate-y-1 hover:shadow-xl bg-gradient-to-br from-green-500 to-green-600">
                             <div class="p-6 flex flex-col items-center text-center text-white h-full">
                                 <div class="bg-white text-green-600 rounded-full p-4 shadow-md mb-4 transition transform group-hover:rotate-6">

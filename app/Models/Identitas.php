@@ -9,16 +9,16 @@ class Identitas extends Model
     protected $fillable = [
         'nama', 'no_hp', 'alamat', 'jenis_kelamin', 'usia',
         'pendidikan', 'pekerjaan', 'tanggal_survei', 'jam_survei',
-        'unit_layanan_id', 'dokter_id', 'topic_id'
+        'unit_layanan_id','topic_id'
     ];
 
     public function unit()
     {
         return $this->belongsTo(UnitLayanan::class, 'unit_layanan_id');
     }
-
-    public function dokter()
+    public function topics()
     {
-        return $this->belongsTo(Dokter::class);
+        return $this->belongsToMany(Topic::class, 'identitas_topic', 'identitas_id', 'topic_id');
     }
+
 }

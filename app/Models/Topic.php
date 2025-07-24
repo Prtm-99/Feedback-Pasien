@@ -12,4 +12,9 @@ class Topic extends Model
     {
         return $this->hasMany(Question::class);
     }
+        public function identitas()
+    {
+        return $this->belongsToMany(Identitas::class, 'identitas_topic', 'topic_id', 'identitas_id');
+    }
+
 }

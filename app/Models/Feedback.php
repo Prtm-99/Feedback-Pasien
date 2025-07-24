@@ -14,6 +14,7 @@ class Feedback extends Model
         'topic_id',
         'answer',
         'comment',
+        'tahun',
     ];
 
     public function question()
