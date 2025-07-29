@@ -10,16 +10,13 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\FeedbackController;
 
-
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::get('identitas/create/{dokterId}', [IdentitasController::class, 'create'])->name('identitas.create');
-Route::post('identitas', [IdentitasController::class, 'store'])->name('identitas.store');
-Route::get('feedback/{identitas}/start', [FeedbackController::class, 'start'])->name('feedback.start');
-Route::get('feedback/form', [FeedbackController::class, 'form'])->name('feedback.form');
-
-
-
+// Public routes for identity and feedback
+Route::get('unit/{unit}/identitas/create', [IdentitasController::class, 'create'])
+    ->name('identitas.create');
+Route::post('identitas', [IdentitasController::class, 'store'])
+    ->name('identitas.store');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -32,15 +29,17 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     // Feedback admin
-    Route::get('feedback', [FeedbackController::class, 'index'])->name('feedback.index');
     Route::get('feedback/rekap', [FeedbackController::class, 'rekapBulan'])->name('feedback.rekap');
     Route::get('feedback/export-excel', [FeedbackController::class, 'exportExcel'])->name('feedback.export.excel');
+
+        // Route Feedback index 
+    Route::get('feedback', [FeedbackController::class, 'index'])->name('feedback.index');
 
     // Unit layanan
     Route::resource('unit', UnitLayananController::class);
     Route::get('unit/{id}/dokter', [UnitLayananController::class, 'showDokter'])->name('unit.dokter');
 
-    // Identitas (tanpa route create karena sudah dibuat di atas)
+    // Identitas
     Route::resource('identitas', IdentitasController::class)->except(['create']);
 
     // Topic dan Question
@@ -55,6 +54,5 @@ Route::prefix('feedback')->name('feedback.')->group(function () {
     Route::get('{identitas}/result', [FeedbackController::class, 'result'])->name('result');
     Route::get('form', [FeedbackController::class, 'form'])->name('form');
 });
-
 
 require __DIR__.'/auth.php';

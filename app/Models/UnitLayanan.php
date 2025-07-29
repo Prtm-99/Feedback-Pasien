@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-use App\Models\Dokter;
 use Illuminate\Database\Eloquent\Model;
 
 class UnitLayanan extends Model
@@ -13,9 +12,6 @@ class UnitLayanan extends Model
         'deskripsi'
     ];
 
-        public function dokters()
-    {
-        return $this->hasMany(Dokter::class, 'unit_layanan_id');
-    }
+
 }
 

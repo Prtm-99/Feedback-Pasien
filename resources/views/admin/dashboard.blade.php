@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-8">📊 Admin Dashboard</h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">📊 Admin Dashboard Rs Muhammadiyah Gresik</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Card: Unit -->
@@ -29,7 +29,7 @@
 
         <!-- Card: IKM -->
         <div class="bg-white rounded-xl shadow-md p-6 col-span-1 hover:shadow-lg hover:scale-105 transition">
-                        <form method="GET" action="{{ route('admin.dashboard') }}" class="mb-4">
+            <form method="GET" action="{{ route('admin.dashboard') }}" class="mb-4">
                 <div class="flex flex-wrap gap-2">
                     <select name="bulan" class="border rounded px-3 py-2">
                         <option value="">📅 Semua Bulan</option>
@@ -67,20 +67,94 @@
 
     <!-- Grafik Feedback dan IKM -->
     <div class="bg-white rounded-xl shadow-md p-6 mt-8 hover:shadow-lg transition">
-            <button onclick="downloadChart('feedbackChart', 'feedback-pasien.png')" class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                📥 Download
-            </button>
-            <div class="mb-6">
-                <h2 class="text-lg font-semibold text-gray-700 mb-2">Feedback Pasien per Bulan</h2>
-                <canvas id="feedbackChart" height="100"></canvas>
-            </div>
-            <div>
+        <button onclick="downloadChart('feedbackChart', 'feedback-pasien.png')" class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+            📥 Download
+        </button>
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Feedback Pasien per Bulan</h2>
+            <canvas id="feedbackChart" height="100"></canvas>
+        </div>
+        <div>
             <button onclick="downloadChart('ikmChart', 'ikm-skor.png')" class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
                 📥 Download
             </button>
-                <h2 class="text-lg font-semibold text-gray-700 mb-2">Peningkatan / Penurunan Skor IKM per Bulan</h2>
-                <canvas id="ikmChart" height="100"></canvas>
-            </div>
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Peningkatan / Penurunan Skor IKM per Bulan</h2>
+            <canvas id="ikmChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- Parameter Terbaik & Terburuk -->
+    <div class="bg-white rounded-xl shadow-md p-6 mt-8 hover:shadow-lg transition">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">🏆 Parameter Terbaik & Terburuk per Unit</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-300 rounded-lg">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 border w-32">Unit</th>
+                        <th class="px-4 py-2 border text-green-600 w-64">Parameter Terbaik</th>
+                        <th class="px-4 py-2 border text-green-600 w-16">Skor</th>
+                        <th class="px-4 py-2 border text-red-600 w-64">Parameter Terburuk</th>
+                        <th class="px-4 py-2 border text-red-600 w-16">Skor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($bestWorstPaginated as $unitId => $bw)
+                        <tr class="hover:bg-gray-50 align-top">
+                            <!-- Nama Unit -->
+                            <td class="px-4 py-2 border font-semibold align-top">{{ $bw['unit'] }}</td>
+
+                            <!-- Daftar Parameter Terbaik -->
+                            <td class="px-4 py-2 border align-top">
+                                <ul>
+                                    @foreach($bw['best']->take(3) as $item)
+                                        <li class="mb-2">
+                                            <strong>{{ $item['question'] }}</strong><br>
+                                            <span class="text-xs text-gray-500">{{ $item['comments'] }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                            <td class="px-4 py-2 border align-top text-center font-bold">
+                                <ul>
+                                    @foreach($bw['best']->take(3) as $item)
+                                        <li class="mb-2">{{ $item['score'] }}</li>
+                                    @endforeach
+                                </ul>
+                            </td>
+
+                            <!-- Daftar Parameter Terburuk -->
+                            <td class="px-4 py-2 border align-top">
+                                <ul>
+                                    @foreach($bw['worst']->take(3) as $item)
+                                        <li class="mb-2">
+                                            <strong>{{ $item['question'] }}</strong><br>
+                                            <span class="text-xs text-gray-500">{{ $item['comments'] }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                            <td class="px-4 py-2 border align-top text-center font-bold">
+                                <ul>
+                                    @foreach($bw['worst']->take(3) as $item)
+                                        <li class="mb-2">{{ $item['score'] }}</li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-4 py-2 border text-center text-gray-500">
+                                Tidak ada data parameter untuk bulan/tahun ini
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            {{ $bestWorstPaginated->links() }}
+        </div>
     </div>
 </div>
 
@@ -96,11 +170,11 @@
     const ikmData       = {!! json_encode($ikmData) !!};
 
     function downloadChart(canvasId, filename) {
-    const link = document.createElement('a');
-    link.href = document.getElementById(canvasId).toDataURL('image/png');
-    link.download = filename;
-    link.click();
-}
+        const link = document.createElement('a');
+        link.href = document.getElementById(canvasId).toDataURL('image/png');
+        link.download = filename;
+        link.click();
+    }
 
     // Feedback chart
     const ctxFeedback = document.getElementById('feedbackChart').getContext('2d');

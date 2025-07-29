@@ -40,6 +40,7 @@
                     <tr>
                         <th class="px-4 py-3">#</th>
                         <th class="px-4 py-3">Unit</th>
+                        <th class="px-4 py-3">No Hp</th>
                         <th class="px-4 py-3 text-center">Feedback</th>
                         <th class="px-4 py-3 text-center">Rata-rata</th>
                         <th class="px-4 py-3 text-center">Kategori</th>
@@ -50,6 +51,7 @@
                         <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition" onclick="toggleDetail('detail-{{ $index }}')">
                             <td class="px-4 py-2">{{ $index + 1 }}</td>
                             <td class="px-4 py-2">{{ optional($item['identitas']->unit)->nama_unit ?? '-' }}</td>
+                            <td class="px-4 py-2">{{ $item['identitas']->no_hp}}</td>
                             <td class="px-4 py-2 text-center">{{ $item['feedback_count'] }}</td>
                             <td class="px-4 py-2 text-center">{{ number_format($item['ikm'], 2, ',', '.') }}</td>
                             <td class="px-4 py-2 text-center font-semibold">

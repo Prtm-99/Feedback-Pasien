@@ -11,20 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-Schema::create('identitas', function (Blueprint $table) {
-    $table->id();
-    $table->string('no_hp');
-    $table->string('jenis_kelamin');
-    $table->integer('usia');
-    $table->string('pendidikan');
-    $table->string('pekerjaan');
-    $table->date('tanggal_survei');
-    $table->time('jam_survei');
-    $table->foreignId('unit_layanan_id')->nullable()->constrained('unit_layanan')->onDelete('set null');
-    $table->foreignId('topic_id')->nullable()->constrained('topics')->onDelete('set null');
-    $table->timestamps();
-});
-}
+        Schema::create('identitas', function (Blueprint $table) {
+            $table->id();
+            $table->string('no_hp');
+            $table->string('jenis_kelamin', 1); // L atau P
+            $table->integer('usia');
+            $table->string('pendidikan');
+            $table->string('pekerjaan');
+            $table->date('tanggal_survei');
+            $table->time('jam_survei');
+            $table->foreignId('unit_layanan_id')
+                  ->nullable()
+                  ->constrained('unit_layanan')
+                  ->onDelete('set null');
+            $table->timestamps();
+            
+            // Kolom tambahan untuk IKM (Indeks Kepuasan Masyarakat)
+            $table->decimal('ikm', 5, 2)->nullable();
+            $table->string('kategori_mutu', 50)->nullable();
+        });
+    }
 
     /**
      * Reverse the migrations.

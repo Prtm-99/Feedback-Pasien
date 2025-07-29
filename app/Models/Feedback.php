@@ -10,7 +10,6 @@ class Feedback extends Model
         'question_id',
         'identitas_id',
         'unit_id',
-        'dokter_id',
         'topic_id',
         'answer',
         'comment',
@@ -32,10 +31,6 @@ class Feedback extends Model
         return $this->belongsTo(UnitLayanan::class, 'unit_id');
     }
 
-    public function dokter()
-    {
-        return $this->belongsTo(Dokter::class, 'dokter_id');
-    }
 
         public function topic()
     {
