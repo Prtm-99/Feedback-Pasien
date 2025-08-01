@@ -13,12 +13,17 @@
     }"
     class="bg-blue-900 text-white min-h-screen shadow-md fixed lg:static inset-y-0 left-0 z-50 transform lg:translate-x-0 transition-all duration-300 ease-in-out"
     x-cloak
-    @click.outside.window="if (window.innerWidth < 1024) sidebarOpen = false"
->
+    @click.outside.window="if (window.innerWidth < 1024) sidebarOpen = false">
+
     {{-- Logo & Collapse/Close Button --}}
     <div class="flex items-center justify-between px-4 py-6">
         <div class="flex items-center gap-2">
-            <img src="{{ asset('storage/rsmg.png') }}" alt="Logo" class="w-10 h-10 rounded-full">
+            <img 
+                src="{{ asset('storage/rsmg.png') }}" 
+                alt="Logo" 
+                :class="sidebarCollapse ? 'w-8 h-8' : 'w-10 h-10'" 
+                class="rounded-full transition-all duration-300"
+            >
             <span class="text-xl font-semibold" x-show="!sidebarCollapse" x-transition>MyDashboard</span>
         </div>
 
