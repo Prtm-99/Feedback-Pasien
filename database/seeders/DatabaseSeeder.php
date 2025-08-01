@@ -20,6 +20,11 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'), // Jangan lupa hashing!
             'email_verified_at' => now(),
         ]);
+
+        // Panggil TopicSeeder juga agar data topic terisi
+        $this->call(TopicSeeder::class);
+
+        // Panggil QuestionSeeder jika memang dibutuhkan
         $this->call(QuestionSeeder::class);
     }
 }

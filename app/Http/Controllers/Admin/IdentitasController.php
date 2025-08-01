@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class IdentitasController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = Identitas::with(['unit'])->latest('tanggal_survei');
@@ -30,6 +27,7 @@ class IdentitasController extends Controller
 
         // Ambil data identitas sesuai filter
         $identitasList = $query->get();
+        $identitasList = $query->paginate(5);
 
         // Ambil semua tahun yang tersedia untuk dropdown filter
         $availableYears = Identitas::selectRaw('YEAR(tanggal_survei) as year')
@@ -40,9 +38,6 @@ class IdentitasController extends Controller
         return view('admin.identitas.index', compact('identitasList', 'availableYears'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
   public function create(UnitLayanan $unit)
     {
         $specialTopics = Topic::whereIn('name', ['Farmasi', 'Laboratorium', 'Radiologi'])
@@ -111,33 +106,21 @@ public function store(Request $request)
     }
 }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $identitas = Identitas::findOrFail($id);

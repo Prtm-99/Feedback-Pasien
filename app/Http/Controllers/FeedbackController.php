@@ -12,15 +12,18 @@ use App\Models\Identitas;
 use App\Models\UnitLayanan;
 use App\Exports\FeedbackExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Response;
 
 class FeedbackController extends Controller
 {
-    public function exportExcel(Request $request)
-    {
-        $bulan = $request->bulan;
-        $tahun = $request->tahun;
-        return Excel::download(new FeedbackExport($bulan, $tahun), 'data_feedback.xlsx');
-    }
+public function exportExcel(Request $request)
+{
+    $bulan = $request->bulan;
+    $tahun = $request->tahun;
+
+    return Excel::download(new FeedbackExport($bulan, $tahun), 'data_feedback.xlsx');
+}
+
 
     public function index(Request $request)
     {
@@ -45,7 +48,10 @@ class FeedbackController extends Controller
             $identitasQuery->whereYear('tanggal_survei', $request->tahun);
         }
 
-        $identitasList = $identitasQuery->paginate(5);
+            $identitasList = $identitasQuery
+        ->latest('tanggal_survei')
+        ->paginate(5)
+        ->appends($request->all()); // agar filter tetap saat pindah halaman
 
         $feedbacks = Feedback::with('question', 'identitas', 'unit', 'topic')
             ->whereIn('identitas_id', $identitasList->pluck('id'))
@@ -162,7 +168,7 @@ class FeedbackController extends Controller
 
 public function start(Request $request, Identitas $identitas)
 {
-    // ✅ 1. Ambil topik wajib Survei IKM
+    // Ambil topik wajib Survei IKM
     $defaultTopic = Topic::where('name', 'Survei IKM')
         ->with(['questions' => function ($q) {
             $q->orderBy('created_at');
@@ -173,10 +179,10 @@ public function start(Request $request, Identitas $identitas)
         abort(500, 'Topik wajib Survei IKM tidak ditemukan');
     }
 
-    // ✅ 2. Ambil topik yang dipilih user saat isi identitas
+    // Ambil topik yang dipilih user saat isi identitas
     $selectedTopics = $identitas->topics->pluck('id')->toArray();
 
-    // ✅ 3. Ambil semua topik yang bukan topik default dan bukan topik lama (Farmasi, Radiologi, Laboratorium)
+    // Ambil semua topik yang bukan topik default dan bukan topik lama (Farmasi, Radiologi, Laboratorium)
     $extraTopics = Topic::whereNotIn('name', [
             'Survei IKM',
             'Farmasi',
@@ -186,7 +192,7 @@ public function start(Request $request, Identitas $identitas)
         ->pluck('id')
         ->toArray();
 
-    // ✅ 4. Gabungkan semua topik: wajib + yang dipilih user + yang baru
+    // Gabungkan semua topik: wajib + yang dipilih user + yang baru
     $topicIds = collect([$defaultTopic->id])
         ->merge($selectedTopics)
         ->merge($extraTopics)
@@ -194,13 +200,13 @@ public function start(Request $request, Identitas $identitas)
         ->values()
         ->toArray();
 
-    // ✅ 5. Urutkan (Survei IKM duluan)
+    // Urutkan (Survei IKM duluan)
     $sortedTopicIds = collect($topicIds)
         ->sortBy(fn($id) => $id == $defaultTopic->id ? 0 : 1)
         ->values()
         ->toArray();
 
-    // ✅ 6. Ambil data topik beserta pertanyaannya
+    // Ambil data topik beserta pertanyaannya
     $topics = Topic::with(['questions' => function ($q) {
             $q->orderBy('created_at');
         }])
@@ -208,7 +214,7 @@ public function start(Request $request, Identitas $identitas)
         ->orderByRaw('FIELD(id, ' . implode(',', $sortedTopicIds) . ')')
         ->get();
 
-// ✅ 7. Inisialisasi session jika belum ada atau update dengan topik baru
+// Inisialisasi session jika belum ada atau update dengan topik baru
 if (!$request->session()->has('selected_topics')) {
     $request->session()->put('selected_topics', $sortedTopicIds);
     $request->session()->put('current_topic_index', 0);
@@ -263,7 +269,7 @@ public function store(Request $request, Identitas $identitas, Topic $topic)
     $validated = $request->validate([
         'answers' => 'required|array',
         'answers.*.value' => 'required',
-        'topic_ids' => 'required|string',  // Contoh: "1,3,5"
+        'topic_ids' => 'required|string',
         'default_topic_id' => 'required|exists:topics,id',
     ]);
 
@@ -299,15 +305,14 @@ public function store(Request $request, Identitas $identitas, Topic $topic)
 
         DB::commit();
 
-        if ($nextTopicId) {
-            // Redirect ke topik berikutnya dengan topic_ids tetap
-return redirect()->route('feedback.start', [
-    'identitas' => $identitas->id,
-    'topic_ids' => implode(',', $topicIds),
-    'next_topic_id' => $nextTopicId,
-]);
-
-        }
+                if ($nextTopicId) {
+                    // Redirect ke topik berikutnya dengan topic_ids tetap
+        return redirect()->route('feedback.start', [
+            'identitas' => $identitas->id,
+            'topic_ids' => implode(',', $topicIds),
+            'next_topic_id' => $nextTopicId,
+        ]);
+    }
 
         // Jika tidak ada next topic, selesai survei
         return redirect()->route('feedback.result', $identitas->id);

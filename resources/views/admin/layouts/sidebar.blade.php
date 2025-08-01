@@ -11,7 +11,7 @@
         'w-64': !sidebarCollapse, 
         'w-16': sidebarCollapse
     }"
-    class="bg-blue-700 text-white min-h-screen shadow-md fixed lg:static inset-y-0 left-0 z-50 transform lg:translate-x-0 transition-all duration-300 ease-in-out"
+    class="bg-blue-900 text-white min-h-screen shadow-md fixed lg:static inset-y-0 left-0 z-50 transform lg:translate-x-0 transition-all duration-300 ease-in-out"
     x-cloak
     @click.outside.window="if (window.innerWidth < 1024) sidebarOpen = false"
 >
@@ -53,7 +53,7 @@
                @click="if (window.innerWidth < 1024) sidebarOpen = false"
                class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200
                       hover:bg-blue-600 hover:text-white
-                      {{ request()->routeIs($item['check']) ? 'bg-blue-900 text-white font-semibold' : 'text-blue-200' }}">
+                      {{ request()->routeIs($item['check']) ? 'bg-blue-700 text-white font-semibold' : 'text-blue-200' }}">
                 <i class="{{ $item['icon'] }}"></i>
                 <span x-show="!sidebarCollapse" x-transition>{{ $item['label'] }}</span>
             </a>

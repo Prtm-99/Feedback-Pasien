@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mx-auto p-4">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold text-gray-800">Daftar Unit Layanan</h2>
+        <h2 class="text-2xl font-bold text-black">Daftar Unit Layanan</h2>
         <a href="{{ route('admin.unit.create') }}" 
            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
             + Tambah Unit
@@ -12,7 +12,7 @@
 
     <div class="overflow-x-auto">
         <table class="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
-            <thead class="bg-gray-100 text-left text-gray-700">
+            <thead class="bg-blue-100 text-left text-black">
                 <tr>
                     <th class="p-3">Nama Unit</th>
                     <th class="p-3">Deskripsi</th>
@@ -48,7 +48,6 @@
     </div>
 </div>
 
-<!-- Modal Delete Confirmation -->
 <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg text-center w-96">
         <p class="text-lg font-semibold mb-4">Yakin ingin menghapus unit ini?</p>

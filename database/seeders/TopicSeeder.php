@@ -16,24 +16,6 @@ $topics = [
         'category' => 'default',
         'is_active' => true
     ],
-    [
-        'name' => 'Farmasi',
-        'is_default' => false,
-        'category' => 'special',
-        'is_active' => true
-    ],
-    [
-        'name' => 'Laboratorium',
-        'is_default' => false,
-        'category' => 'special',
-        'is_active' => true
-    ],
-    [
-        'name' => 'Radiologi',
-        'is_default' => false,
-        'category' => 'special',
-        'is_active' => true
-    ]
 ];
 
 

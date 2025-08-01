@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-6xl mx-auto p-6 bg-white shadow rounded">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold text-gray-700">Daftar Pertanyaan</h2>
+        <h2 class="text-2xl font-semibold text-black">Daftar Pertanyaan</h2>
         <a href="{{ route('admin.question.create') }}"
            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             + Tambah Pertanyaan
@@ -12,7 +12,7 @@
 
     <table class="min-w-full bg-white border border-gray-200">
         <thead>
-            <tr class="bg-gray-100 text-gray-600 text-left">
+            <tr class="bg-blue-100 text-black text-left">
                 <th class="py-2 px-4 border-b">#</th>
                 <th class="py-2 px-4 border-b">Topik</th>
                 <th class="py-2 px-4 border-b">Pertanyaan</th>

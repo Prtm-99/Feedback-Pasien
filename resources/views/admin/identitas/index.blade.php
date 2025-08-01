@@ -42,56 +42,50 @@
             </button>
         </form>
 
-        {{-- ✅ Tabel Data --}}
-        <div class="bg-white dark:bg-gray-900 shadow-lg rounded-xl overflow-hidden">
+                {{-- ✅ Tabel Data --}}
+                <div class="bg-white shadow-lg rounded-xl overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full text-sm text-left text-gray-600 dark:text-gray-300">
-                    <thead class="bg-gray-100 dark:bg-gray-800 text-xs uppercase font-bold sticky top-0 z-10">
+                <table class="min-w-full text-sm text-left text-black border border-gray-200">
+                    <thead class="bg-blue-100 text-gray-800 uppercase text-xs font-bold sticky top-0 z-10">
                         <tr>
-                            <th class="px-4 py-3">#</th>
-                            <th class="px-4 py-3">No HP</th>
-                            <th class="px-4 py-3">Usia</th>
-                            <th class="px-4 py-3">Gender</th>
-                            <th class="px-4 py-3">Pendidikan</th>
-                            <th class="px-4 py-3">Pekerjaan</th>
-                            <th class="px-4 py-3">Unit</th>
-                            <th class="px-4 py-3">Tgl Survei</th>
-                            <th class="px-4 py-3">Jam</th>
-                            <th class="px-4 py-3 text-center">Aksi</th>
+                            <th class="px-4 py-3 border">#</th>
+                            <th class="px-4 py-3 border">No HP</th>
+                            <th class="px-4 py-3 border">Usia</th>
+                            <th class="px-4 py-3 border">Gender</th>
+                            <th class="px-4 py-3 border">Pendidikan</th>
+                            <th class="px-4 py-3 border">Pekerjaan</th>
+                            <th class="px-4 py-3 border">Unit</th>
+                            <th class="px-4 py-3 border">Tgl Survei</th>
+                            <th class="px-4 py-3 border">Jam</th>
+                            <th class="px-4 py-3 border text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($identitasList as $index => $identitas)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition duration-200">
-                                <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                                <td class="px-4 py-2">{{ $identitas->no_hp }}</td>
-                                <td class="px-4 py-2">{{ $identitas->usia }}</td>
-                                <td class="px-4 py-2">{{ $identitas->jenis_kelamin }}</td>
-                                <td class="px-4 py-2">{{ $identitas->pendidikan }}</td>
-                                <td class="px-4 py-2">{{ $identitas->pekerjaan }}</td>
-                                <td class="px-4 py-2">{{ $identitas->unit->nama_unit ?? '-' }}</td>
-                                <td class="px-4 py-2">{{ $identitas->tanggal_survei }}</td>
-                                <td class="px-4 py-2">{{ $identitas->jam_survei }}</td>
-                                <td class="px-4 py-2 flex gap-2 justify-center">
-                                    {{-- Tombol Edit --}}
-                                    <a href="{{ route('admin.identitas.edit', $identitas->id) }}"
-                                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-white text-xs font-semibold rounded-lg shadow transition">
-                                        ✏️ Edit
-                                    </a>
-                                    {{-- Tombol Delete --}}
+                            <tr class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-50 transition duration-200">
+                                <td class="px-4 py-2 border">{{ $loop->iteration }}</td>
+                                <td class="px-4 py-2 border">{{ $identitas->no_hp }}</td>
+                                <td class="px-4 py-2 border">{{ $identitas->usia }}</td>
+                                <td class="px-4 py-2 border">{{ $identitas->jenis_kelamin }}</td>
+                                <td class="px-4 py-2 border">{{ $identitas->pendidikan }}</td>
+                                <td class="px-4 py-2 border">{{ $identitas->pekerjaan }}</td>
+                                <td class="px-4 py-2 border">{{ $identitas->unit->nama_unit ?? '-' }}</td>
+                                <td class="px-4 py-2 border">{{ $identitas->tanggal_survei }}</td>
+                                <td class="px-4 py-2 border">{{ $identitas->jam_survei }}</td>
+                                <td class="px-4 py-2 border flex gap-2 justify-center">
                                     <form id="delete-form-{{ $identitas->id }}" action="{{ route('admin.identitas.destroy', $identitas->id) }}" method="POST">
                                         @csrf @method('DELETE')
                                         <button type="button"
                                             onclick="confirmDelete({{ $identitas->id }})"
                                             class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg shadow transition">
-                                            🗑️ Hapus
+                                            Hapus
                                         </button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" class="text-center text-gray-500 dark:text-gray-400 py-6">
+                                <td colspan="11" class="text-center text-gray-500 py-6">
                                     Tidak ada data identitas tersedia.
                                 </td>
                             </tr>
@@ -99,11 +93,13 @@
                     </tbody>
                 </table>
             </div>
+            <div class="p-4 bg-blue-100 border-t border-gray-200 shadow-sm text-black">
+                {{ $identitasList->links() }}
+            </div>
         </div>
     </div>
 </div>
 
-{{-- ✅ Modal Konfirmasi --}}
 <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg text-center w-96">
         <p class="text-lg font-semibold mb-4 text-gray-800">Yakin ingin menghapus data ini?</p>
@@ -116,7 +112,6 @@
     </div>
 </div>
 
-{{-- ✅ JS --}}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const alertBox = document.getElementById('alert-success');
@@ -127,6 +122,7 @@
     });
 
     let deleteFormId = null;
+    
 
     function confirmDelete(id) {
         deleteFormId = id;

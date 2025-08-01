@@ -23,7 +23,6 @@
     </form>
 </div>
 
-<!-- JavaScript: Tombol loading state -->
 <script>
     const form = document.getElementById('topikForm');
     const submitBtn = document.getElementById('submitBtn');

@@ -6,7 +6,7 @@
 
     <form method="POST" action="{{ route('admin.unit.update', $unit->id) }}" class="space-y-5">
         @csrf
-        @method('PUT') <!-- penting agar tidak dianggap "create" -->
+        @method('PUT')
 
         <div>
             <label for="nama_unit" class="block text-sm font-medium text-gray-700">Nama Unit</label>

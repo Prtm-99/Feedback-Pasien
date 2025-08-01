@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\FeedbackController;
 
+// Route untuk User Dashboard
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
 // Public routes for identity and feedback
@@ -53,6 +54,9 @@ Route::prefix('feedback')->name('feedback.')->group(function () {
     Route::post('{identitas}/submit/{topic}', [FeedbackController::class, 'store'])->name('store');
     Route::get('{identitas}/result', [FeedbackController::class, 'result'])->name('result');
     Route::get('form', [FeedbackController::class, 'form'])->name('form');
+    Route::get('{identitas}/submit/{topic}', function ($identitas, $topic) {
+    return redirect()->route('feedback.start', ['identitas' => $identitas]);
+    })->name('store.get.redirect');
 });
 
 require __DIR__.'/auth.php';

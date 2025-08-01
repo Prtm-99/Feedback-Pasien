@@ -34,77 +34,80 @@
                 </a>
         </form>
 
-        <div class="bg-white dark:bg-gray-900 shadow rounded-lg">
-            <table class="min-w-full text-sm text-left text-gray-700 dark:text-gray-300">
-                <thead class="bg-gray-100 dark:bg-gray-800 text-xs font-bold">
-                    <tr>
-                        <th class="px-4 py-3">#</th>
-                        <th class="px-4 py-3">Unit</th>
-                        <th class="px-4 py-3">No Hp</th>
-                        <th class="px-4 py-3 text-center">Feedback</th>
-                        <th class="px-4 py-3 text-center">Rata-rata</th>
-                        <th class="px-4 py-3 text-center">Kategori</th>
+        <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-left text-black border border-gray-200">
+            <thead class="bg-blue-100 text-gray-800 uppercase text-xs font-bold sticky top-0 z-10">
+                <tr>
+                    <th class="px-4 py-3 border">#</th>
+                    <th class="px-4 py-3 border">Unit</th>
+                    <th class="px-4 py-3 border">No Hp</th>
+                    <th class="px-4 py-3 text-center border">Feedback</th>
+                    <th class="px-4 py-3 text-center border">Rata-rata</th>
+                    <th class="px-4 py-3 text-center border">Kategori</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($summary as $index => $item)
+                    <tr class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-50 transition duration-200 cursor-pointer"
+                        onclick="toggleDetail('detail-{{ $index }}')">
+                        <td class="px-4 py-2 border">{{ $index + 1 }}</td>
+                        <td class="px-4 py-2 border">{{ optional($item['identitas']->unit)->nama_unit ?? '-' }}</td>
+                        <td class="px-4 py-2 border">{{ $item['identitas']->no_hp }}</td>
+                        <td class="px-4 py-2 text-center border">{{ $item['feedback_count'] }}</td>
+                        <td class="px-4 py-2 text-center border">{{ number_format($item['ikm'], 2, ',', '.') }}</td>
+                        <td class="px-4 py-2 text-center font-semibold border">
+                            <span class="px-2 py-1 rounded text-white
+                                @if($item['ikm'] >= 85)
+                                    bg-green-500
+                                @elseif($item['ikm'] >= 70)
+                                    bg-yellow-400 text-gray-900
+                                @else
+                                    bg-red-500
+                                @endif">
+                                {{ $item['kategori'] }}
+                            </span>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @forelse($summary as $index => $item)
-                        <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition" onclick="toggleDetail('detail-{{ $index }}')">
-                            <td class="px-4 py-2">{{ $index + 1 }}</td>
-                            <td class="px-4 py-2">{{ optional($item['identitas']->unit)->nama_unit ?? '-' }}</td>
-                            <td class="px-4 py-2">{{ $item['identitas']->no_hp}}</td>
-                            <td class="px-4 py-2 text-center">{{ $item['feedback_count'] }}</td>
-                            <td class="px-4 py-2 text-center">{{ number_format($item['ikm'], 2, ',', '.') }}</td>
-                            <td class="px-4 py-2 text-center font-semibold">
-                                <span class="px-2 py-1 rounded text-white
-                                    @if($item['ikm'] >= 85)
-                                        bg-green-500
-                                    @elseif($item['ikm'] >= 70)
-                                        bg-yellow-500
-                                    @else
-                                        bg-red-500
-                                    @endif">
-                                    {{ $item['kategori'] }}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr id="detail-{{ $index }}" class="hidden bg-gray-50 dark:bg-gray-800">
-                            <td colspan="7" class="px-4 py-2">
-                                <table class="w-full text-sm mt-2 border">
-                                    <thead class="bg-gray-200 dark:bg-gray-700">
-                                        <tr>
-                                            <th class="px-2 py-1">Topik</th>
-                                            <th class="px-2 py-1">Pertanyaan</th>
-                                            <th class="px-2 py-1">Jawaban</th>
-                                            <th class="px-2 py-1">Komentar</th>
+                    <tr id="detail-{{ $index }}" class="hidden bg-gray-50">
+                        <td colspan="7" class="px-4 py-2 border">
+                            <table class="w-full text-sm mt-2 border border-gray-200 rounded">
+                                <thead class="bg-blue-100 text-black uppercase text-xs font-bold rounded">
+                                    <tr>
+                                        <th class="px-2 py-1 border border-gray-300">Topik</th>
+                                        <th class="px-2 py-1 border border-gray-300">Pertanyaan</th>
+                                        <th class="px-2 py-1 border border-gray-300">Jawaban</th>
+                                        <th class="px-2 py-1 border border-gray-300">Komentar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($feedbacksByIdentitas[$item['identitas']->id] ?? [] as $fb)
+                                        <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-50' }}">
+                                            <td class="px-2 py-1 border border-gray-300">{{ $fb->topic->name ?? '-' }}</td>
+                                            <td class="px-2 py-1 border border-gray-300">{{ $fb->question->text ?? $fb->pertanyaan_statis ?? '-' }}</td>
+                                            <td class="px-2 py-1 border border-gray-300">{{ $fb->answer }}</td>
+                                            <td class="px-2 py-1 border border-gray-300">{{ $fb->comment ?? '-' }}</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($feedbacksByIdentitas[$item['identitas']->id] ?? [] as $fb)
-                                            <tr>
-                                                <td class="px-2 py-1">{{ $fb->topic->name ?? '-' }}</td>
-                                                <td class="px-2 py-1">{{ $fb->question->text ?? $fb->pertanyaan_statis ?? '-' }}</td>
-                                                <td class="px-2 py-1">{{ $fb->answer }}</td>
-                                                <td class="px-2 py-1">{{ $fb->comment ?? '-' }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center py-4 text-gray-500 dark:text-gray-400">
-                                Tidak ada data feedback ditemukan.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center text-black py-6">
+                            Tidak ada data feedback ditemukan.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    <div class="p-4 bg-blue-100 border-t border-gray-200 shadow-sm rounded-b">
+        {{ $identitasList->withQueryString()->links() }}
+    </div>
+</div>
 
-            <div class="px-4 py-4">
-                {{ $identitasList->withQueryString()->links() }}
-            </div>
-        </div>
     </div>
 </div>
 

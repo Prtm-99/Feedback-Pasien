@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-8">📊 Admin Dashboard Rs Muhammadiyah Gresik</h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">Rs Muhammadiyah Gresik</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Card: Unit -->
@@ -83,10 +83,16 @@
         </div>
     </div>
 
-    <!-- Parameter Terbaik & Terburuk -->
+    <!-- Grafik Parameter Terbaik & Terburuk -->
     <div class="bg-white rounded-xl shadow-md p-6 mt-8 hover:shadow-lg transition">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4">🏆 Parameter Terbaik & Terburuk per Unit</h2>
-        <div class="overflow-x-auto">
+                    <button onclick="downloadChart('bestWorstChart', 'parameter.png')" class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                📥 Download
+            </button>
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Parameter Terbaik & Terburuk per Unit (Grafik)</h2>
+
+        <canvas id="bestWorstChart" height="250"></canvas>
+
+        <div class="overflow-x-auto mt-6">
             <table class="min-w-full border border-gray-300 rounded-lg">
                 <thead class="bg-gray-100">
                     <tr>
@@ -106,7 +112,7 @@
                             <!-- Daftar Parameter Terbaik -->
                             <td class="px-4 py-2 border align-top">
                                 <ul>
-                                    @foreach($bw['best']->take(3) as $item)
+                                    @foreach($bw['best'] as $item)
                                         <li class="mb-2">
                                             <strong>{{ $item['question'] }}</strong><br>
                                             <span class="text-xs text-gray-500">{{ $item['comments'] }}</span>
@@ -116,7 +122,7 @@
                             </td>
                             <td class="px-4 py-2 border align-top text-center font-bold">
                                 <ul>
-                                    @foreach($bw['best']->take(3) as $item)
+                                    @foreach($bw['best'] as $item)
                                         <li class="mb-2">{{ $item['score'] }}</li>
                                     @endforeach
                                 </ul>
@@ -125,7 +131,7 @@
                             <!-- Daftar Parameter Terburuk -->
                             <td class="px-4 py-2 border align-top">
                                 <ul>
-                                    @foreach($bw['worst']->take(3) as $item)
+                                    @foreach($bw['worst'] as $item)
                                         <li class="mb-2">
                                             <strong>{{ $item['question'] }}</strong><br>
                                             <span class="text-xs text-gray-500">{{ $item['comments'] }}</span>
@@ -135,7 +141,7 @@
                             </td>
                             <td class="px-4 py-2 border align-top text-center font-bold">
                                 <ul>
-                                    @foreach($bw['worst']->take(3) as $item)
+                                    @foreach($bw['worst'] as $item)
                                         <li class="mb-2">{{ $item['score'] }}</li>
                                     @endforeach
                                 </ul>
@@ -158,7 +164,6 @@
     </div>
 </div>
 
-<!-- FontAwesome CDN -->
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 <!-- ChartJS -->
@@ -168,6 +173,25 @@
     const feedbackData   = {!! json_encode($data) !!};
     const ikmLabels     = {!! json_encode($ikmLabels) !!};
     const ikmData       = {!! json_encode($ikmData) !!};
+
+    // Data untuk grafik Parameter Terbaik & Terburuk
+    const bwLabels = [
+        @foreach($bestWorstPaginated as $unitId => $bw)
+            @json($bw['unit']),
+        @endforeach
+    ];
+
+    const bestScores = [
+        @foreach($bestWorstPaginated as $unitId => $bw)
+            {{ collect($bw['best'])->avg('score') ?? 0 }},
+        @endforeach
+    ];
+
+    const worstScores = [
+        @foreach($bestWorstPaginated as $unitId => $bw)
+            {{ collect($bw['worst'])->avg('score') ?? 0 }},
+        @endforeach
+    ];
 
     function downloadChart(canvasId, filename) {
         const link = document.createElement('a');
@@ -239,6 +263,49 @@
                 y: {
                     beginAtZero: true,
                     max: 100
+                }
+            }
+        }
+    });
+
+    // Parameter Terbaik & Terburuk chart
+    const ctxBW = document.getElementById('bestWorstChart').getContext('2d');
+    new Chart(ctxBW, {
+        type: 'bar',
+        data: {
+            labels: bwLabels,
+            datasets: [
+                {
+                    label: 'Rata-rata Skor Parameter Terbaik',
+                    data: bestScores,
+                    backgroundColor: 'rgba(34, 197, 94, 0.7)', // hijau
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Rata-rata Skor Parameter Terburuk',
+                    data: worstScores,
+                    backgroundColor: 'rgba(239, 68, 68, 0.7)', // merah
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                }
+            },
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: '#f9fafb',
+                    titleColor: '#111827',
+                    bodyColor: '#1f2937',
                 }
             }
         }

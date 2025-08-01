@@ -81,7 +81,7 @@ class AdminDashboardController extends Controller
         $ikmLabels = $ikmBulanan->pluck('bulan');
         $ikmData = $ikmBulanan->pluck('ikm');
 
-        // Tahun tersedia
+        // Tanggal dan Tahun
         $availableYears = Identitas::selectRaw('YEAR(tanggal_survei) as year')
             ->whereNotNull('tanggal_survei')
             ->distinct()
@@ -89,71 +89,85 @@ class AdminDashboardController extends Controller
             ->pluck('year')
             ->toArray();
 
-        // === ✅ Parameter terbaik & terburuk + komentar ===
-$feedbackScores = Feedback::select(
-        'unit_id',
-        'question_id',
+        // Parameter terbaik & terburuk + komentar 
+    $feedbackScores = Feedback::select(
+            'unit_id',
+            'question_id',
         DB::raw('AVG(CASE 
-            WHEN answer IN ("Sangat Puas","Sangat sesuai","Sangat cepat","Gratis","Sangat kompeten","Sangat baik","Sangat sopan dan ramah","Dikelola dengan baik","Ya") THEN 4
-            WHEN answer IN ("Puas","Sesuai","Cepat","Murah","Kompeten","Baik","Sopan dan ramah","Kurang maksimal") THEN 3
-            WHEN answer IN ("Kurang","Kurang sesuai","Kurang cepat","Cukup mahal","Kurang kompeten","Cukup","Kurang sopan dan ramah","Tidak berfungsi") THEN 2
-            ELSE 1 END
-        ) as avg_score'),
-        DB::raw('GROUP_CONCAT(comment SEPARATOR " | ") as comments')
-    )
-    ->whereHas('identitas', function($q) use ($filterBulan, $filterTahun) {
-        if ($filterBulan) $q->whereMonth('tanggal_survei', $filterBulan);
-        if ($filterTahun) $q->whereYear('tanggal_survei', $filterTahun);
-    })
-    ->groupBy('unit_id', 'question_id')
-    ->with(['question', 'unit'])
-    ->get()
-    ->groupBy('unit_id');
+            -- Sangat Puas / Puas
+            WHEN answer IN (
+                "Sangat Puas", "Sangat sesuai", "Sangat mudah", "Sangat cepat", "Gratis", 
+                "Sangat kompeten", "Sangat sopan dan ramah", "Dikelola dengan baik", "Sangat baik", 
+                "Ya"
+            ) THEN 4
 
-$bestWorst = [];
-foreach ($feedbackScores as $unitId => $scores) {
-    // Ambil semua pertanyaan, urutkan
-    $sortedScores = $scores->sortByDesc('avg_score');
+            WHEN answer IN (
+                "Puas", "Sesuai", "Mudah", "Cepat", "Murah", "Kompeten", "Baik", 
+                "Sopan dan ramah", "Kurang maksimal"
+            ) THEN 3
 
-    // Top 3 terbaik
-    $bestList = $sortedScores->map(function ($item) {
-        return [
-            'question' => $item->question->text ?? 'N/A',
-            'score' => round($item->avg_score, 2),
-            'comments' => $item->comments ?? '-'
+            WHEN answer IN (
+                "Kurang", "Kurang sesuai", "Kurang mudah", "Kurang cepat", "Cukup mahal", 
+                "Kurang kompeten", "Cukup", "Kurang sopan dan ramah", "Tidak berfungsi"
+            ) THEN 2
+
+            WHEN answer IN (
+                "Tidak sesuai", "Tidak mudah", "Lambat", "Sangat mahal", "Tidak kompeten", 
+                "Tidak sopan dan ramah", "Tidak ada", "Buruk", "Tidak, karena ..."
+            ) THEN 1
+
+            ELSE 1 
+        END) as avg_score'),
+
+            DB::raw('GROUP_CONCAT(comment SEPARATOR " | ") as comments')
+        )
+        ->whereHas('identitas', function($q) use ($filterBulan, $filterTahun) {
+            if ($filterBulan) $q->whereMonth('tanggal_survei', $filterBulan);
+            if ($filterTahun) $q->whereYear('tanggal_survei', $filterTahun);
+        })
+        ->groupBy('unit_id', 'question_id')
+        ->with(['question', 'unit'])
+        ->get()
+        ->groupBy('unit_id');
+
+    $bestWorst = [];
+    foreach ($feedbackScores as $unitId => $scores) {
+        $sortedScores = $scores->sortByDesc('avg_score')->values();
+
+        $bestList = $sortedScores->take(3)->map(function ($item) {
+            return [
+                'question' => $item->question->text ?? 'N/A',
+                'score' => round($item->avg_score, 2),
+                'comments' => $item->comments ?? '-'
+            ];
+        });
+
+        $worstList = $scores->sortBy('avg_score')->values()->take(3)->map(function ($item) {
+            return [
+                'question' => $item->question->text ?? 'N/A',
+                'score' => round($item->avg_score, 2),
+                'comments' => $item->comments ?? '-'
+            ];
+        });
+
+        $bestWorst[$unitId] = [
+            'unit' => $scores->first()->unit->nama_unit ?? 'N/A',
+            'best' => $bestList,
+            'worst' => $worstList,
         ];
-    });
+    }
 
-    // Top 3 terburuk (nilai rata-rata terendah)
-    $worstList = $scores->sortBy('avg_score')->map(function ($item) {
-        return [
-            'question' => $item->question->text ?? 'N/A',
-            'score' => round($item->avg_score, 2),
-            'comments' => $item->comments ?? '-'
-        ];
-    });
+    $bestWorstCollection = collect($bestWorst);
 
-    $bestWorst[$unitId] = [
-        'unit' => $scores->first()->unit->nama_unit ?? 'N/A',
-        'best' => $bestList,
-        'worst' => $worstList,
-    ];
-}
-
-    // Setelah loop bestWorst selesai
-$bestWorstCollection = collect($bestWorst);
-
-// Tambahkan pagination manual
-$page = $request->input('page', 1);
-$perPage = 2;
-$bestWorstPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
-    $bestWorstCollection->forPage($page, $perPage),
-    $bestWorstCollection->count(),
-    $perPage,
-    $page,
-    ['path' => $request->url(), 'query' => $request->query()]
-);
-
+    $page = $request->input('page', 1);
+    $perPage = 2;
+    $bestWorstPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
+        $bestWorstCollection->forPage($page, $perPage),
+        $bestWorstCollection->count(),
+        $perPage,
+        $page,
+        ['path' => $request->url(), 'query' => $request->query()]
+    );
 
         return view('admin.dashboard', compact(
             'units', 'feedbackCount', 'months', 'labels', 'data',
