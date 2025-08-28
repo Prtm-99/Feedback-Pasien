@@ -40,7 +40,7 @@ class IdentitasController extends Controller
 
   public function create(UnitLayanan $unit)
     {
-        $specialTopics = Topic::whereIn('name', ['Farmasi', 'Laboratorium', 'Radiologi'])
+        $specialTopics = Topic::whereIn('name', ['Farmasi', 'Laboratorium', 'Radiologi', 'IGD', 'OPERASI', 'GIZI'])
                             ->where('is_default', false)
                             ->get();
         

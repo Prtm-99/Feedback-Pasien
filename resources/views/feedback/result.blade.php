@@ -6,6 +6,13 @@
             Masukan Anda sangat berharga untuk peningkatan layanan kami.
         </p>
 
+        <div class="text-center mb-8">
+            <a href="{{ route('dashboard') }}"
+                class="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out">
+                Kembali ke Dashboard
+            </a>
+        </div>
+
         <hr class="border-gray-300 mb-8">
 
         <h3 class="text-2xl font-semibold text-gray-800 mb-4">Detail Feedback Anda:</h3>

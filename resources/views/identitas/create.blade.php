@@ -88,7 +88,7 @@
 
                 <!-- Topik Tambahan -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Topik Survei Tambahan</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Topik Survei Tambahan (opsional)</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         @foreach($specialTopics as $topic)
                             <label for="topic_{{ $topic->id }}" 

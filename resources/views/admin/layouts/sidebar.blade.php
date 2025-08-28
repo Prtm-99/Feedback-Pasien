@@ -18,8 +18,7 @@
     {{-- Logo & Collapse/Close Button --}}
     <div class="flex items-center justify-between px-4 py-6">
         <div class="flex items-center gap-2">
-            <img 
-                src="{{ asset('storage/rsmg.png') }}" 
+            <img src="{{ Vite::asset('public/images/rsmg.png') }}" 
                 alt="Logo" 
                 :class="sidebarCollapse ? 'w-8 h-8' : 'w-10 h-10'" 
                 class="rounded-full transition-all duration-300"
